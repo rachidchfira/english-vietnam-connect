@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,23 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Custom colors for Vietnam-focused platform
+				navy: {
+					DEFAULT: '#0A2463',
+					light: '#183A7E',
+				},
+				teal: {
+					DEFAULT: '#247BA0',
+					light: '#3B95BB',
+				},
+				coral: {
+					DEFAULT: '#FF6B6B',
+					light: '#FF8B8B',
+				},
+				gold: {
+					DEFAULT: '#FFB400',
+					light: '#FFCC4D',
 				}
 			},
 			borderRadius: {
