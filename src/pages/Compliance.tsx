@@ -1,24 +1,57 @@
 
+import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { FileCheck, AlertTriangle, Clock, Calendar, Upload } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { 
+  FileCheck, 
+  AlertTriangle, 
+  Clock, 
+  Calendar, 
+  Upload, 
+  Download, 
+  Search, 
+  Filter, 
+  FileText
+} from "lucide-react";
+import { DocumentUploadForm } from "@/components/DocumentUploadForm";
+import { ComplianceDashboard } from "@/components/ComplianceDashboard";
 
 const Compliance = () => {
+  const [showUploadForm, setShowUploadForm] = useState(false);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Compliance</h1>
-        <Button>Import Documents</Button>
+        <Button onClick={() => setShowUploadForm(true)}>
+          <Upload className="mr-2 h-4 w-4" /> Upload Documents
+        </Button>
       </div>
+
+      {showUploadForm && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Upload Compliance Documents</CardTitle>
+            <CardDescription>
+              Submit your visa, work permit, or other compliance documents
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <DocumentUploadForm onComplete={() => setShowUploadForm(false)} />
+          </CardContent>
+        </Card>
+      )}
 
       <Tabs defaultValue="visa">
         <TabsList>
           <TabsTrigger value="visa">Visa Tracking</TabsTrigger>
           <TabsTrigger value="documents">Document Storage</TabsTrigger>
           <TabsTrigger value="compliance">Compliance Calendar</TabsTrigger>
+          <TabsTrigger value="dashboard">HR Dashboard</TabsTrigger>
         </TabsList>
         
         <TabsContent value="visa" className="space-y-4">
@@ -141,9 +174,15 @@ const Compliance = () => {
                   <CardTitle>Secure Document Storage</CardTitle>
                   <CardDescription>Store and manage important teacher documentation</CardDescription>
                 </div>
-                <Button>
-                  <Upload className="mr-2 h-4 w-4" /> Upload Files
-                </Button>
+                <div className="flex gap-2">
+                  <div className="relative">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input placeholder="Search documents..." className="pl-8 w-[250px]" />
+                  </div>
+                  <Button variant="outline" size="icon">
+                    <Filter className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -183,7 +222,10 @@ const Compliance = () => {
                     },
                   ].map((doc, i) => (
                     <div key={i} className="px-4 py-3 border-b grid grid-cols-5 text-sm items-center">
-                      <div>{doc.type}</div>
+                      <div className="flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-muted-foreground" />
+                        {doc.type}
+                      </div>
                       <div>{doc.person}</div>
                       <div>{doc.date}</div>
                       <div>
@@ -194,7 +236,9 @@ const Compliance = () => {
                       </div>
                       <div className="flex space-x-2">
                         <Button variant="ghost" size="sm">View</Button>
-                        <Button variant="ghost" size="sm">Download</Button>
+                        <Button variant="ghost" size="sm">
+                          <Download className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
                   ))}
@@ -262,6 +306,10 @@ const Compliance = () => {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+        
+        <TabsContent value="dashboard">
+          <ComplianceDashboard />
         </TabsContent>
       </Tabs>
     </div>
