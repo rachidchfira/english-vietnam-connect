@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,8 +23,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertTriangle } from "lucide-react";
-import { FileUp, Upload } from "lucide-react";
+import { AlertTriangle, FileUp, Upload } from "lucide-react";
 
 interface ResourceUploadFormProps {
   language: "en" | "vi";
