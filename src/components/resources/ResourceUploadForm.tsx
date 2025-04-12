@@ -24,7 +24,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
+import { AlertTriangle } from "lucide-react";
 import { FileUp, Upload } from "lucide-react";
 
 interface ResourceUploadFormProps {
@@ -216,7 +216,7 @@ export function ResourceUploadForm({ language }: ResourceUploadFormProps) {
       
       {isOffline && (
         <Alert variant="destructive" className="mb-6">
-          <ExclamationTriangleIcon className="h-4 w-4" />
+          <AlertTriangle className="h-4 w-4" />
           <AlertTitle>Offline Mode</AlertTitle>
           <AlertDescription>
             {translations.offlineModeAlert[language]}
