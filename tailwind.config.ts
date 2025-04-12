@@ -63,7 +63,13 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Custom colors for Vietnam-focused platform
+				// Custom colors based on the image
+				'schedule-green': '#1CA042',
+				'schedule-yellow': '#FFFF00',
+				'schedule-light-green': '#C6E7C8',
+				'schedule-red': '#FF0000',
+				'schedule-header': '#333333',
+				// Original custom colors for Vietnam-focused platform
 				navy: {
 					DEFAULT: '#0A2463',
 					light: '#183A7E',

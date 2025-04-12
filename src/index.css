@@ -14,35 +14,35 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 213 89% 22%;  /* Navy blue */
+    --primary: 142 70% 37%;  /* Schedule green */
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 196 63% 38%;  /* Teal */
+    --secondary: 60 100% 50%;  /* Schedule yellow */
     --secondary-foreground: 222.2 47.4% 11.2%;
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 42 100% 50%;  /* Gold */
+    --accent: 142 45% 84%;  /* Schedule light green */
     --accent-foreground: 222.2 47.4% 11.2%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 100% 50%;  /* Schedule red */
     --destructive-foreground: 210 40% 98%;
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 196 63% 38%;  /* Teal */
+    --ring: 142 70% 37%;  /* Schedule green */
 
     --radius: 0.5rem;
 
-    --sidebar-background: 213 89% 22%;  /* Navy blue */
+    --sidebar-background: 142 70% 37%;  /* Schedule green */
     --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 196 63% 38%;  /* Teal */
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 42 100% 50%;  /* Gold */
+    --sidebar-primary: 60 100% 50%;  /* Schedule yellow */
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 142 45% 84%;  /* Schedule light green */
     --sidebar-accent-foreground: 222.2 47.4% 11.2%;
-    --sidebar-border: 213 43% 30%;
-    --sidebar-ring: 196 63% 38%;  /* Teal */
+    --sidebar-border: 142 40% 30%;
+    --sidebar-ring: 142 70% 37%;  /* Schedule green */
   }
 
   .dark {
@@ -96,22 +96,39 @@
 
 @layer components {
   .nav-item {
-    @apply flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-foreground;
+    @apply flex items-center gap-3 rounded-lg px-3 py-2 text-sidebar-foreground transition-all hover:text-sidebar-accent-foreground hover:bg-sidebar-accent;
   }
   
   .nav-item.active {
-    @apply bg-primary text-primary-foreground;
+    @apply bg-sidebar-accent text-sidebar-accent-foreground font-medium;
   }
   
   .dashboard-card {
-    @apply rounded-lg border bg-card p-4 shadow-sm;
+    @apply rounded-lg border bg-card p-4 shadow-md hover:shadow-lg transition-shadow;
   }
   
   .dashboard-stat {
-    @apply text-2xl font-bold;
+    @apply text-2xl font-bold text-primary;
   }
   
   .dashboard-stat-label {
     @apply text-sm text-muted-foreground;
+  }
+
+  /* Schedule-specific components */
+  .schedule-header {
+    @apply bg-schedule-green text-white font-medium py-2 px-4 border-b;
+  }
+  
+  .schedule-break {
+    @apply bg-schedule-yellow text-schedule-header font-bold;
+  }
+  
+  .schedule-period {
+    @apply bg-schedule-light-green;
+  }
+  
+  .schedule-highlight {
+    @apply text-schedule-red font-bold;
   }
 }
