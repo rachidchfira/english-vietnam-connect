@@ -3,8 +3,7 @@ import { DashboardCard } from "@/components/DashboardCard";
 import { 
   ChartContainer, 
   ChartLegend, 
-  ChartTooltip, 
-  ChartTooltipContent 
+  ChartTooltip
 } from "@/components/ui/chart";
 import { 
   ResponsiveContainer, 
@@ -142,7 +141,7 @@ export function FinancialOverview({ language }: FinancialOverviewProps) {
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="month" />
                     <YAxis />
-                    <Tooltip content={(props) => <ChartTooltipContent {...props} />} />
+                    <Tooltip />
                     <Legend />
                     <Bar dataKey="revenue" fill="#8B5CF6" name="revenue" />
                     <Bar dataKey="expenses" fill="#F97316" name="expenses" />
@@ -183,7 +182,7 @@ export function FinancialOverview({ language }: FinancialOverviewProps) {
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                       </Pie>
-                      <Tooltip content={(props) => <ChartTooltipContent {...props} />} />
+                      <Tooltip />
                     </PieChart>
                   </ResponsiveContainer>
                 </ChartContainer>
@@ -220,7 +219,7 @@ export function FinancialOverview({ language }: FinancialOverviewProps) {
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                       </Pie>
-                      <Tooltip content={(props) => <ChartTooltipContent {...props} />} />
+                      <Tooltip />
                     </PieChart>
                   </ResponsiveContainer>
                 </ChartContainer>

@@ -35,6 +35,7 @@ interface SchoolDetailsProps {
 
 export function SchoolDetails({ schoolId }: SchoolDetailsProps) {
   const [activeTab, setActiveTab] = useState("overview");
+  const [isChatbotMinimized, setIsChatbotMinimized] = useState(false);
   
   // Mock data - in a real app, this would come from Supabase
   const schoolData = {
@@ -338,7 +339,7 @@ export function SchoolDetails({ schoolId }: SchoolDetailsProps) {
         </TabsContent>
         
         <TabsContent value="support">
-          <SupportChatbot schoolId={schoolId} />
+          <SupportChatbot minimized={isChatbotMinimized} onMinimize={() => setIsChatbotMinimized(!isChatbotMinimized)} />
         </TabsContent>
       </Tabs>
     </div>
