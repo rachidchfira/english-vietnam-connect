@@ -11,6 +11,7 @@ import Compliance from "./pages/Compliance";
 import Scheduling from "./pages/Scheduling";
 import Financial from "./pages/Financial";
 import Resources from "./pages/Resources";
+import ClientManagement from "./pages/ClientManagement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,7 +30,7 @@ const App = () => (
             <Route path="/scheduling" element={<Scheduling />} />
             <Route path="/financial" element={<Financial />} />
             <Route path="/resources" element={<Resources />} />
-            <Route path="/clients" element={<Dashboard />} />
+            <Route path="/clients" element={<ClientManagement />} />
             <Route path="/analytics" element={<Dashboard />} />
           </Route>
           <Route path="*" element={<NotFound />} />
@@ -40,4 +41,3 @@ const App = () => (
 );
 
 export default App;
-

@@ -1,0 +1,163 @@
+
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Building, Search, MapPin, Phone, Calendar, Download } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+// Mock data - would come from Supabase in a real implementation
+const mockSchools = [
+  {
+    id: "1",
+    name: "Hanoi International School",
+    location: "Hanoi",
+    contactPerson: "Nguyen Van A",
+    phone: "+84 123 456 789",
+    contractEnd: "2025-06-30",
+    status: "active"
+  },
+  {
+    id: "2",
+    name: "HCMC Language Academy",
+    location: "Ho Chi Minh City",
+    contactPerson: "Tran Thi B",
+    phone: "+84 987 654 321",
+    contractEnd: "2025-03-15",
+    status: "active"
+  },
+  {
+    id: "3",
+    name: "Da Nang English Center",
+    location: "Da Nang",
+    contactPerson: "Le Van C",
+    phone: "+84 555 123 456",
+    contractEnd: "2024-12-31",
+    status: "renewal"
+  },
+  {
+    id: "4",
+    name: "Nha Trang School of Languages",
+    location: "Nha Trang",
+    contactPerson: "Pham Thi D",
+    phone: "+84 333 999 888",
+    contractEnd: "2025-01-20",
+    status: "inactive"
+  }
+];
+
+interface SchoolListProps {
+  onSchoolSelect: (id: string) => void;
+}
+
+export function SchoolList({ onSchoolSelect }: SchoolListProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  
+  const filteredSchools = mockSchools.filter(school => {
+    const matchesSearch = school.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          school.location.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesStatus = statusFilter === "all" || school.status === statusFilter;
+    
+    return matchesSearch && matchesStatus;
+  });
+  
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "active":
+        return <Badge className="bg-green-500">Active</Badge>;
+      case "renewal":
+        return <Badge className="bg-amber-500">Renewal Needed</Badge>;
+      case "inactive":
+        return <Badge className="bg-gray-500">Inactive</Badge>;
+      default:
+        return <Badge>{status}</Badge>;
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0 md:space-x-2">
+        <div className="relative flex-1">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search schools..."
+            className="pl-8"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-full md:w-40">
+            <SelectValue placeholder="Filter by status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Statuses</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="renewal">Renewal Needed</SelectItem>
+            <SelectItem value="inactive">Inactive</SelectItem>
+          </SelectContent>
+        </Select>
+        <Button variant="outline">
+          <Download className="mr-2 h-4 w-4" /> Export
+        </Button>
+      </div>
+      
+      <Card>
+        <CardHeader className="px-6 py-4">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg">School Directory</CardTitle>
+            <span className="text-sm text-muted-foreground">{filteredSchools.length} schools</span>
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="border-b px-6 py-3 grid grid-cols-1 md:grid-cols-5 font-medium text-sm">
+            <div className="hidden md:block">School Name</div>
+            <div className="hidden md:block">Location</div>
+            <div className="hidden md:block">Contact</div>
+            <div className="hidden md:block">Contract End</div>
+            <div className="hidden md:block">Status</div>
+          </div>
+          <div className="divide-y">
+            {filteredSchools.length > 0 ? filteredSchools.map((school) => (
+              <div 
+                key={school.id} 
+                className="px-6 py-4 grid grid-cols-1 md:grid-cols-5 gap-2 text-sm cursor-pointer hover:bg-muted transition-colors"
+                onClick={() => onSchoolSelect(school.id)}
+              >
+                <div className="font-medium flex items-center">
+                  <Building className="mr-2 h-4 w-4 text-muted-foreground md:hidden" /> 
+                  {school.name}
+                </div>
+                <div className="flex items-center">
+                  <MapPin className="mr-2 h-4 w-4 text-muted-foreground md:hidden" />
+                  {school.location}
+                </div>
+                <div>
+                  <div className="flex items-center">
+                    <Phone className="mr-2 h-4 w-4 text-muted-foreground md:hidden" />
+                    {school.contactPerson}
+                  </div>
+                  <div className="text-muted-foreground text-xs">{school.phone}</div>
+                </div>
+                <div className="flex items-center">
+                  <Calendar className="mr-2 h-4 w-4 text-muted-foreground md:hidden" />
+                  {new Date(school.contractEnd).toLocaleDateString()}
+                </div>
+                <div>
+                  {getStatusBadge(school.status)}
+                </div>
+              </div>
+            )) : (
+              <div className="px-6 py-8 text-center text-muted-foreground">
+                No schools found matching your search criteria
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
