@@ -131,7 +131,7 @@ export function FinancialOverview({ language }: FinancialOverviewProps) {
               <ChartContainer
                 config={{
                   revenue: { label: translations.revenue.en },
-                  expenses: { label: translations.expenses.en },
+                  expenses: { label: translations.totalExpenses.en },
                 }}
               >
                 <ResponsiveContainer width="100%" height="100%">
@@ -143,7 +143,7 @@ export function FinancialOverview({ language }: FinancialOverviewProps) {
                     <XAxis dataKey="month" />
                     <YAxis />
                     <Tooltip content={(props) => <ChartTooltipContent {...props} />} />
-                    <Legend content={(props) => <ChartLegend {...props} />} />
+                    <Legend />
                     <Bar dataKey="revenue" fill="#8B5CF6" name="revenue" />
                     <Bar dataKey="expenses" fill="#F97316" name="expenses" />
                   </BarChart>
