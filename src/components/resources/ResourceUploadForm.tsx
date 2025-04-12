@@ -269,13 +269,13 @@ export function ResourceUploadForm({ language }: ResourceUploadFormProps) {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="Grammar">{translations.grammarOption[language]}</SelectItem>
-                    <SelectItem value="Speaking">{translations.speakingOption[language]}</SelectItem>
-                    <SelectItem value="Listening">{translations.listeningOption[language]}</SelectItem>
-                    <SelectItem value="Reading">{translations.readingOption[language]}</SelectItem>
-                    <SelectItem value="Writing">{translations.writingOption[language]}</SelectItem>
-                    <SelectItem value="Pronunciation">{translations.pronunciationOption[language]}</SelectItem>
-                    <SelectItem value="Vocabulary">{translations.vocabularyOption[language]}</SelectItem>
+                    <SelectItem value="grammar">{translations.grammarOption[language]}</SelectItem>
+                    <SelectItem value="speaking">{translations.speakingOption[language]}</SelectItem>
+                    <SelectItem value="listening">{translations.listeningOption[language]}</SelectItem>
+                    <SelectItem value="reading">{translations.readingOption[language]}</SelectItem>
+                    <SelectItem value="writing">{translations.writingOption[language]}</SelectItem>
+                    <SelectItem value="pronunciation">{translations.pronunciationOption[language]}</SelectItem>
+                    <SelectItem value="vocabulary">{translations.vocabularyOption[language]}</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />

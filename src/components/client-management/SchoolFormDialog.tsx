@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -120,7 +119,7 @@ export function SchoolFormDialog({ open, onOpenChange, onSchoolCreated }: School
                         <SelectItem value="Nha Trang">Nha Trang</SelectItem>
                         <SelectItem value="Hue">Hue</SelectItem>
                         <SelectItem value="Can Tho">Can Tho</SelectItem>
-                        <SelectItem value="Other">Other</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
