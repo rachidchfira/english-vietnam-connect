@@ -5,11 +5,13 @@ import { PayrollDashboard } from "@/components/financial/PayrollDashboard";
 import { InvoicingDashboard } from "@/components/financial/InvoicingDashboard";
 import { ExpenseManagement } from "@/components/financial/ExpenseManagement";
 import { FinancialOverview } from "@/components/financial/FinancialOverview";
-import { Globe } from "lucide-react";
+import { FinancialCalculators } from "@/components/financial/calculators/FinancialCalculators";
+import { Globe, Calculator } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Financial() {
   const [language, setLanguage] = useState<"en" | "vi">("en");
+  const [activeTab, setActiveTab] = useState("overview");
 
   const toggleLanguage = () => {
     setLanguage(prev => prev === "en" ? "vi" : "en");
@@ -39,6 +41,10 @@ export default function Financial() {
     overview: {
       en: "Overview",
       vi: "Tổng Quan"
+    },
+    calculators: {
+      en: "Calculators",
+      vi: "Máy Tính"
     }
   };
 
@@ -57,12 +63,16 @@ export default function Financial() {
         </Button>
       </div>
 
-      <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid grid-cols-4 mb-8">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid grid-cols-5 mb-8">
           <TabsTrigger value="overview">{translations.overview[language]}</TabsTrigger>
           <TabsTrigger value="payroll">{translations.payroll[language]}</TabsTrigger>
           <TabsTrigger value="invoicing">{translations.invoicing[language]}</TabsTrigger>
           <TabsTrigger value="expenses">{translations.expenses[language]}</TabsTrigger>
+          <TabsTrigger value="calculators" className="flex items-center gap-2">
+            <Calculator className="h-4 w-4" />
+            {translations.calculators[language]}
+          </TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview" className="space-y-4">
@@ -79,6 +89,10 @@ export default function Financial() {
         
         <TabsContent value="expenses" className="space-y-4">
           <ExpenseManagement language={language} />
+        </TabsContent>
+
+        <TabsContent value="calculators" className="space-y-4">
+          <FinancialCalculators language={language} />
         </TabsContent>
       </Tabs>
     </div>
