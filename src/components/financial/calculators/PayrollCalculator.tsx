@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import {
   Card,
@@ -32,7 +31,7 @@ export function PayrollCalculator({ language }: { language: "en" | "vi" }) {
   const [month, setMonth] = useState<string>("4");
   const [year, setYear] = useState<string>("2025");
   const [currency, setCurrency] = useState<"VND" | "USD">("VND");
-  const [results, setResults] = useState<Array<{ id: number; total: number; }>([]);
+  const [results, setResults] = useState<Array<{ id: number; total: number; }>>([]);
   const [bulkInput, setBulkInput] = useState<string>("");
 
   const translations = {
