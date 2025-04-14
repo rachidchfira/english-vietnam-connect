@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Plus, Users } from "lucide-react";
+import { Plus, Users, ArrowRightLeft } from "lucide-react";
 import { TeacherOnboardingForm } from "@/components/TeacherOnboardingForm";
 import { SchedulingTool } from "@/components/SchedulingTool";
 import { PerformanceDashboard } from "@/components/PerformanceDashboard";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { CalendarIcon, Download, FileText, Search } from "lucide-react";
+import { TeacherSchoolMatching } from "@/components/matching/TeacherSchoolMatching";
 
 const Workforce = () => {
   const [activeTab, setActiveTab] = useState("teachers");
@@ -22,8 +23,12 @@ const Workforce = () => {
       </div>
 
       <Tabs defaultValue={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-4 md:w-fit">
+        <TabsList className="grid grid-cols-5 md:w-fit">
           <TabsTrigger value="teachers">Teachers</TabsTrigger>
+          <TabsTrigger value="matching">
+            <ArrowRightLeft className="mr-2 h-4 w-4" />
+            Matching
+          </TabsTrigger>
           <TabsTrigger value="scheduling">Scheduling</TabsTrigger>
           <TabsTrigger value="onboarding">Onboarding</TabsTrigger>
           <TabsTrigger value="performance">Performance</TabsTrigger>
@@ -79,6 +84,10 @@ const Workforce = () => {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+        
+        <TabsContent value="matching">
+          <TeacherSchoolMatching />
         </TabsContent>
         
         <TabsContent value="scheduling">

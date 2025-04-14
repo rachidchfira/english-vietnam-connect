@@ -1,4 +1,3 @@
-
 import { 
   Users, 
   FileCheck, 
@@ -6,7 +5,8 @@ import {
   Book, 
   Building, 
   TrendingUp, 
-  Calendar 
+  Calendar,
+  ArrowRightLeft
 } from "lucide-react";
 import { StatCard } from "@/components/StatCard";
 import { DashboardCard } from "@/components/DashboardCard";
@@ -48,6 +48,10 @@ const Dashboard = () => {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <DashboardCard title="Quick Actions">
           <div className="space-y-2">
+            <button className="w-full rounded-lg border border-input bg-background px-3 py-2 text-left hover:bg-muted flex items-center">
+              <ArrowRightLeft className="mr-2 h-4 w-4 text-primary" />
+              Match Teachers with Schools
+            </button>
             <button className="w-full rounded-lg border border-input bg-background px-3 py-2 text-left hover:bg-muted">
               Schedule Interview
             </button>
@@ -56,9 +60,6 @@ const Dashboard = () => {
             </button>
             <button className="w-full rounded-lg border border-input bg-background px-3 py-2 text-left hover:bg-muted">
               Generate Payroll
-            </button>
-            <button className="w-full rounded-lg border border-input bg-background px-3 py-2 text-left hover:bg-muted">
-              Compliance Check
             </button>
           </div>
         </DashboardCard>
