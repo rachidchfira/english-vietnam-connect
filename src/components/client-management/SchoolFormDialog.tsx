@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -11,19 +10,21 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Tables, TablesInsert } from "@/integrations/supabase/types"; // Import the types
 
+// Use TablesInsert to ensure we're using the correct insert type
 const formSchema = z.object({
   name: z.string().min(3, { message: "School name must be at least 3 characters" }),
   location: z.string().min(2, { message: "Location is required" }),
   address: z.string().min(5, { message: "Please provide a complete address" }),
-  contactPerson: z.string().min(3, { message: "Contact person's name is required" }),
+  contact_person: z.string().min(3, { message: "Contact person's name is required" }),
   position: z.string().min(2, { message: "Position is required" }),
   email: z.string().email({ message: "Please enter a valid email address" }),
   phone: z.string().min(7, { message: "Please enter a valid phone number" }),
   website: z.string().optional(),
-  contractStart: z.string().min(1, { message: "Contract start date is required" }),
-  contractEnd: z.string().min(1, { message: "Contract end date is required" }),
-  status: z.string(),
+  contract_start: z.string().min(1, { message: "Contract start date is required" }),
+  contract_end: z.string().min(1, { message: "Contract end date is required" }),
+  status: z.string().optional().default('active'),
   notes: z.string().optional(),
 });
 
@@ -45,13 +46,13 @@ export function SchoolFormDialog({ open, onOpenChange, onSchoolCreated }: School
       name: "",
       location: "",
       address: "",
-      contactPerson: "",
+      contact_person: "",
       position: "",
       email: "",
       phone: "",
       website: "",
-      contractStart: "",
-      contractEnd: "",
+      contract_start: "",
+      contract_end: "",
       status: "active",
       notes: "",
     }
@@ -68,14 +69,14 @@ export function SchoolFormDialog({ open, onOpenChange, onSchoolCreated }: School
           name: values.name,
           location: values.location,
           address: values.address,
-          contact_person: values.contactPerson,
+          contact_person: values.contact_person,
           position: values.position,
           email: values.email,
           phone: values.phone,
           website: values.website || null,
-          contract_start: values.contractStart,
-          contract_end: values.contractEnd,
-          status: values.status,
+          contract_start: values.contract_start,
+          contract_end: values.contract_end,
+          status: values.status || 'active',
           notes: values.notes || null
         }])
         .select();
@@ -182,7 +183,7 @@ export function SchoolFormDialog({ open, onOpenChange, onSchoolCreated }: School
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormField
                 control={form.control}
-                name="contactPerson"
+                name="contact_person"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Contact Person</FormLabel>
@@ -282,7 +283,7 @@ export function SchoolFormDialog({ open, onOpenChange, onSchoolCreated }: School
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="contractStart"
+                name="contract_start"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Contract Start Date</FormLabel>
@@ -296,7 +297,7 @@ export function SchoolFormDialog({ open, onOpenChange, onSchoolCreated }: School
               
               <FormField
                 control={form.control}
-                name="contractEnd"
+                name="contract_end"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Contract End Date</FormLabel>

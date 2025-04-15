@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,16 +6,10 @@ import { Badge } from "@/components/ui/badge";
 import { Building, Search, MapPin, Phone, Calendar, Download } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import { Tables } from "@/integrations/supabase/types"; // Import the types
 
-interface School {
-  id: string;
-  name: string;
-  location: string;
-  contact_person: string;
-  phone: string;
-  contract_end: string;
-  status: string;
-}
+// Update the School interface to match the database schema
+interface School extends Tables<'schools'> {}
 
 interface SchoolListProps {
   onSchoolSelect: (id: string) => void;
