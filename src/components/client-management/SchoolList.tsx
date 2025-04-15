@@ -6,10 +6,17 @@ import { Badge } from "@/components/ui/badge";
 import { Building, Search, MapPin, Phone, Calendar, Download } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { Tables } from "@/integrations/supabase/types"; // Import the types
 
-// Update the School interface to match the database schema
-interface School extends Tables<'schools'> {}
+// Define a type that matches our database schema
+interface School {
+  id: string;
+  name: string;
+  location: string;
+  contact_person: string;
+  phone: string;
+  contract_end: string;
+  status: string;
+}
 
 interface SchoolListProps {
   onSchoolSelect: (id: string) => void;
@@ -26,9 +33,9 @@ export function SchoolList({ onSchoolSelect }: SchoolListProps) {
     async function fetchSchools() {
       setIsLoading(true);
       try {
-        const { data, error } = await supabase
+        let { data, error } = await supabase
           .from('schools')
-          .select('*');
+          .select('id, name, location, contact_person, phone, contract_end, status');
           
         if (error) {
           console.error("Error fetching schools:", error);

@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables, TablesInsert } from "@/integrations/supabase/types"; // Import the types
 
-// Use TablesInsert to ensure we're using the correct insert type
+// Define the form schema to match our database schema
 const formSchema = z.object({
   name: z.string().min(3, { message: "School name must be at least 3 characters" }),
   location: z.string().min(2, { message: "Location is required" }),
@@ -24,7 +24,7 @@ const formSchema = z.object({
   website: z.string().optional(),
   contract_start: z.string().min(1, { message: "Contract start date is required" }),
   contract_end: z.string().min(1, { message: "Contract end date is required" }),
-  status: z.string().optional().default('active'),
+  status: z.string().default('active'),
   notes: z.string().optional(),
 });
 
@@ -62,23 +62,9 @@ export function SchoolFormDialog({ open, onOpenChange, onSchoolCreated }: School
     setIsSubmitting(true);
     
     try {
-      // Insert the new school into the Supabase database
       const { data, error } = await supabase
         .from('schools')
-        .insert([{
-          name: values.name,
-          location: values.location,
-          address: values.address,
-          contact_person: values.contact_person,
-          position: values.position,
-          email: values.email,
-          phone: values.phone,
-          website: values.website || null,
-          contract_start: values.contract_start,
-          contract_end: values.contract_end,
-          status: values.status || 'active',
-          notes: values.notes || null
-        }])
+        .insert([values])
         .select();
       
       if (error) {
@@ -95,9 +81,10 @@ export function SchoolFormDialog({ open, onOpenChange, onSchoolCreated }: School
         });
         form.reset();
         onSchoolCreated();
+        onOpenChange(false);
       }
     } catch (error) {
-      console.error("Error creating school", error);
+      console.error("Error creating school:", error);
       toast({
         title: "Error creating school",
         description: "An unexpected error occurred. Please try again.",

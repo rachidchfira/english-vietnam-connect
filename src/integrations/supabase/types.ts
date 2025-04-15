@@ -161,6 +161,57 @@ export type Database = {
         }
         Relationships: []
       }
+      schools: {
+        Row: {
+          address: string
+          contact_person: string
+          contract_end: string
+          contract_start: string
+          created_at: string | null
+          email: string
+          id: string
+          location: string
+          name: string
+          notes: string | null
+          phone: string
+          position: string
+          status: string
+          website: string | null
+        }
+        Insert: {
+          address: string
+          contact_person: string
+          contract_end: string
+          contract_start: string
+          created_at?: string | null
+          email: string
+          id?: string
+          location: string
+          name: string
+          notes?: string | null
+          phone: string
+          position: string
+          status?: string
+          website?: string | null
+        }
+        Update: {
+          address?: string
+          contact_person?: string
+          contract_end?: string
+          contract_start?: string
+          created_at?: string | null
+          email?: string
+          id?: string
+          location?: string
+          name?: string
+          notes?: string | null
+          phone?: string
+          position?: string
+          status?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       students: {
         Row: {
           avatar_url: string | null
@@ -205,8 +256,12 @@ export type Database = {
           hire_date: string | null
           id: string
           name: string
+          passport_number: string | null
           phone: string | null
+          qualifications: string | null
           subjects: string[] | null
+          visa_expiry: string | null
+          visa_type: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -215,8 +270,12 @@ export type Database = {
           hire_date?: string | null
           id?: string
           name: string
+          passport_number?: string | null
           phone?: string | null
+          qualifications?: string | null
           subjects?: string[] | null
+          visa_expiry?: string | null
+          visa_type?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -225,8 +284,12 @@ export type Database = {
           hire_date?: string | null
           id?: string
           name?: string
+          passport_number?: string | null
           phone?: string | null
+          qualifications?: string | null
           subjects?: string[] | null
+          visa_expiry?: string | null
+          visa_type?: string | null
         }
         Relationships: []
       }
