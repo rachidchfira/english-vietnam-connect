@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -22,6 +21,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Globe } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 // Define the form schema with validation
 const formSchema = z.object({
@@ -42,6 +43,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 export function TeacherOnboardingForm() {
   const [language, setLanguage] = useState<'en' | 'vi'>('en');
+  const { toast } = useToast();
   
   // Form setup with validation
   const form = useForm<FormValues>({
@@ -56,11 +58,51 @@ export function TeacherOnboardingForm() {
     },
   });
 
-  // Form submission handler (to be connected to Supabase later)
-  const onSubmit = (values: FormValues) => {
-    console.log("Form submitted:", values);
-    // Will connect to Supabase later
-    alert(language === 'en' ? "Form submitted successfully!" : "Gửi biểu mẫu thành công!");
+  // Form submission handler connected to Supabase
+  const onSubmit = async (values: FormValues) => {
+    try {
+      // Insert the new teacher into the teachers table
+      const { data, error } = await supabase
+        .from('teachers')
+        .insert([{
+          name: values.full_name,
+          email: values.email,
+          passport_number: values.passport_number,
+          visa_type: values.visa_type,
+          visa_expiry: values.visa_expiry,
+          qualifications: values.qualifications,
+          // We'll handle file upload separately in a real implementation
+        }])
+        .select();
+      
+      if (error) {
+        console.error("Form submission error:", error);
+        toast({
+          title: language === 'en' ? "Error" : "Lỗi",
+          description: language === 'en' ? 
+            "There was a problem adding the teacher." : 
+            "Có vấn đề khi thêm giáo viên.",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: language === 'en' ? "Success" : "Thành công",
+          description: language === 'en' ? 
+            "Teacher successfully added to the system!" : 
+            "Đã thêm giáo viên vào hệ thống thành công!",
+        });
+        form.reset();
+      }
+    } catch (error) {
+      console.error("Form submission error:", error);
+      toast({
+        title: language === 'en' ? "Error" : "Lỗi",
+        description: language === 'en' ? 
+          "An unexpected error occurred." : 
+          "Đã xảy ra lỗi không mong muốn.",
+        variant: "destructive"
+      });
+    }
   };
 
   const toggleLanguage = () => {

@@ -1,51 +1,22 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Building, Search, MapPin, Phone, Calendar, Download } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
 
-// Mock data - would come from Supabase in a real implementation
-const mockSchools = [
-  {
-    id: "1",
-    name: "Hanoi International School",
-    location: "Hanoi",
-    contactPerson: "Nguyen Van A",
-    phone: "+84 123 456 789",
-    contractEnd: "2025-06-30",
-    status: "active"
-  },
-  {
-    id: "2",
-    name: "HCMC Language Academy",
-    location: "Ho Chi Minh City",
-    contactPerson: "Tran Thi B",
-    phone: "+84 987 654 321",
-    contractEnd: "2025-03-15",
-    status: "active"
-  },
-  {
-    id: "3",
-    name: "Da Nang English Center",
-    location: "Da Nang",
-    contactPerson: "Le Van C",
-    phone: "+84 555 123 456",
-    contractEnd: "2024-12-31",
-    status: "renewal"
-  },
-  {
-    id: "4",
-    name: "Nha Trang School of Languages",
-    location: "Nha Trang",
-    contactPerson: "Pham Thi D",
-    phone: "+84 333 999 888",
-    contractEnd: "2025-01-20",
-    status: "inactive"
-  }
-];
+interface School {
+  id: string;
+  name: string;
+  location: string;
+  contact_person: string;
+  phone: string;
+  contract_end: string;
+  status: string;
+}
 
 interface SchoolListProps {
   onSchoolSelect: (id: string) => void;
@@ -54,8 +25,34 @@ interface SchoolListProps {
 export function SchoolList({ onSchoolSelect }: SchoolListProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [schools, setSchools] = useState<School[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   
-  const filteredSchools = mockSchools.filter(school => {
+  // Fetch schools from Supabase
+  useEffect(() => {
+    async function fetchSchools() {
+      setIsLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('schools')
+          .select('*');
+          
+        if (error) {
+          console.error("Error fetching schools:", error);
+        } else {
+          setSchools(data || []);
+        }
+      } catch (error) {
+        console.error("Error fetching schools:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    
+    fetchSchools();
+  }, []);
+  
+  const filteredSchools = schools.filter(school => {
     const matchesSearch = school.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           school.location.toLowerCase().includes(searchQuery.toLowerCase());
     
@@ -113,49 +110,55 @@ export function SchoolList({ onSchoolSelect }: SchoolListProps) {
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="border-b px-6 py-3 grid grid-cols-1 md:grid-cols-5 font-medium text-sm">
-            <div className="hidden md:block">School Name</div>
-            <div className="hidden md:block">Location</div>
-            <div className="hidden md:block">Contact</div>
-            <div className="hidden md:block">Contract End</div>
-            <div className="hidden md:block">Status</div>
-          </div>
-          <div className="divide-y">
-            {filteredSchools.length > 0 ? filteredSchools.map((school) => (
-              <div 
-                key={school.id} 
-                className="px-6 py-4 grid grid-cols-1 md:grid-cols-5 gap-2 text-sm cursor-pointer hover:bg-muted transition-colors"
-                onClick={() => onSchoolSelect(school.id)}
-              >
-                <div className="font-medium flex items-center">
-                  <Building className="mr-2 h-4 w-4 text-muted-foreground md:hidden" /> 
-                  {school.name}
-                </div>
-                <div className="flex items-center">
-                  <MapPin className="mr-2 h-4 w-4 text-muted-foreground md:hidden" />
-                  {school.location}
-                </div>
-                <div>
-                  <div className="flex items-center">
-                    <Phone className="mr-2 h-4 w-4 text-muted-foreground md:hidden" />
-                    {school.contactPerson}
+          {isLoading ? (
+            <div className="p-8 text-center">Loading schools...</div>
+          ) : (
+            <>
+              <div className="border-b px-6 py-3 grid grid-cols-1 md:grid-cols-5 font-medium text-sm">
+                <div className="hidden md:block">School Name</div>
+                <div className="hidden md:block">Location</div>
+                <div className="hidden md:block">Contact</div>
+                <div className="hidden md:block">Contract End</div>
+                <div className="hidden md:block">Status</div>
+              </div>
+              <div className="divide-y">
+                {filteredSchools.length > 0 ? filteredSchools.map((school) => (
+                  <div 
+                    key={school.id} 
+                    className="px-6 py-4 grid grid-cols-1 md:grid-cols-5 gap-2 text-sm cursor-pointer hover:bg-muted transition-colors"
+                    onClick={() => onSchoolSelect(school.id)}
+                  >
+                    <div className="font-medium flex items-center">
+                      <Building className="mr-2 h-4 w-4 text-muted-foreground md:hidden" /> 
+                      {school.name}
+                    </div>
+                    <div className="flex items-center">
+                      <MapPin className="mr-2 h-4 w-4 text-muted-foreground md:hidden" />
+                      {school.location}
+                    </div>
+                    <div>
+                      <div className="flex items-center">
+                        <Phone className="mr-2 h-4 w-4 text-muted-foreground md:hidden" />
+                        {school.contact_person}
+                      </div>
+                      <div className="text-muted-foreground text-xs">{school.phone}</div>
+                    </div>
+                    <div className="flex items-center">
+                      <Calendar className="mr-2 h-4 w-4 text-muted-foreground md:hidden" />
+                      {new Date(school.contract_end).toLocaleDateString()}
+                    </div>
+                    <div>
+                      {getStatusBadge(school.status)}
+                    </div>
                   </div>
-                  <div className="text-muted-foreground text-xs">{school.phone}</div>
-                </div>
-                <div className="flex items-center">
-                  <Calendar className="mr-2 h-4 w-4 text-muted-foreground md:hidden" />
-                  {new Date(school.contractEnd).toLocaleDateString()}
-                </div>
-                <div>
-                  {getStatusBadge(school.status)}
-                </div>
+                )) : (
+                  <div className="px-6 py-8 text-center text-muted-foreground">
+                    No schools found matching your search criteria
+                  </div>
+                )}
               </div>
-            )) : (
-              <div className="px-6 py-8 text-center text-muted-foreground">
-                No schools found matching your search criteria
-              </div>
-            )}
-          </div>
+            </>
+          )}
         </CardContent>
       </Card>
     </div>

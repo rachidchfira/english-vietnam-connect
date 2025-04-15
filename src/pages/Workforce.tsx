@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Plus, Users, ArrowRightLeft } from "lucide-react";
@@ -9,9 +10,60 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { CalendarIcon, Download, FileText, Search } from "lucide-react";
 import { TeacherSchoolMatching } from "@/components/matching/TeacherSchoolMatching";
+import { supabase } from "@/integrations/supabase/client";
+
+interface Teacher {
+  id: string;
+  name: string;
+  location?: string;
+  specialty?: string;
+  status?: string;
+}
 
 const Workforce = () => {
   const [activeTab, setActiveTab] = useState("teachers");
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch teachers from Supabase
+  useEffect(() => {
+    async function fetchTeachers() {
+      setIsLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('teachers')
+          .select('*');
+          
+        if (error) {
+          console.error("Error fetching teachers:", error);
+        } else {
+          setTeachers(data || []);
+        }
+      } catch (error) {
+        console.error("Error fetching teachers:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    
+    fetchTeachers();
+  }, []);
+
+  // Filter teachers based on search query
+  const filteredTeachers = teachers.filter(teacher => 
+    teacher.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (teacher.location && teacher.location.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (teacher.specialty && teacher.specialty.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
+  // Refresh teachers after adding a new one
+  const refreshTeachers = async () => {
+    const { data } = await supabase.from('teachers').select('*');
+    if (data) {
+      setTeachers(data);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -41,6 +93,8 @@ const Workforce = () => {
               <Input
                 placeholder="Search teachers..."
                 className="pl-8"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
             <Button variant="outline">
@@ -52,7 +106,7 @@ const Workforce = () => {
             <CardHeader className="px-6 py-4">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">Teacher Directory</CardTitle>
-                <CardDescription>124 teachers total</CardDescription>
+                <CardDescription>{filteredTeachers.length} teachers total</CardDescription>
               </div>
             </CardHeader>
             <CardContent className="p-0">
@@ -65,22 +119,30 @@ const Workforce = () => {
                 <div>Actions</div>
               </div>
               <div className="divide-y">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="px-6 py-3 grid grid-cols-6 text-sm items-center">
-                    <div>John Smith</div>
-                    <div>T-{1000 + i}</div>
-                    <div>
-                      <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                        Active
-                      </span>
+                {isLoading ? (
+                  <div className="px-6 py-8 text-center">Loading teachers...</div>
+                ) : filteredTeachers.length > 0 ? (
+                  filteredTeachers.map((teacher) => (
+                    <div key={teacher.id} className="px-6 py-3 grid grid-cols-6 text-sm items-center">
+                      <div>{teacher.name}</div>
+                      <div>T-{teacher.id.substring(0, 5)}</div>
+                      <div>
+                        <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+                          {teacher.status || "Active"}
+                        </span>
+                      </div>
+                      <div>{teacher.location || "Not specified"}</div>
+                      <div>{teacher.specialty || "General English"}</div>
+                      <div>
+                        <Button variant="ghost" size="sm">View</Button>
+                      </div>
                     </div>
-                    <div>Ho Chi Minh City</div>
-                    <div>IELTS Preparation</div>
-                    <div>
-                      <Button variant="ghost" size="sm">View</Button>
-                    </div>
+                  ))
+                ) : (
+                  <div className="px-6 py-8 text-center text-muted-foreground">
+                    No teachers found matching your search criteria
                   </div>
-                ))}
+                )}
               </div>
             </CardContent>
           </Card>

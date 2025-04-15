@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -8,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const formSchema = z.object({
   name: z.string().min(3, { message: "School name must be at least 3 characters" }),
@@ -34,6 +37,7 @@ interface SchoolFormDialogProps {
 
 export function SchoolFormDialog({ open, onOpenChange, onSchoolCreated }: SchoolFormDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -57,14 +61,47 @@ export function SchoolFormDialog({ open, onOpenChange, onSchoolCreated }: School
     setIsSubmitting(true);
     
     try {
-      // In a real application, we would send this data to Supabase
-      // Simulating a network request delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Insert the new school into the Supabase database
+      const { data, error } = await supabase
+        .from('schools')
+        .insert([{
+          name: values.name,
+          location: values.location,
+          address: values.address,
+          contact_person: values.contactPerson,
+          position: values.position,
+          email: values.email,
+          phone: values.phone,
+          website: values.website || null,
+          contract_start: values.contractStart,
+          contract_end: values.contractEnd,
+          status: values.status,
+          notes: values.notes || null
+        }])
+        .select();
       
-      onSchoolCreated();
-      form.reset();
+      if (error) {
+        console.error("Error creating school:", error);
+        toast({
+          title: "Error creating school",
+          description: error.message,
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "School created successfully",
+          description: `${values.name} has been added to the system.`,
+        });
+        form.reset();
+        onSchoolCreated();
+      }
     } catch (error) {
       console.error("Error creating school", error);
+      toast({
+        title: "Error creating school",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
     } finally {
       setIsSubmitting(false);
     }
