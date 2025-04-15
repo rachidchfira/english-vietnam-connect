@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,17 +6,78 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Calendar, Clock, Filter, Users, School, Search } from "lucide-react";
 import { SchedulingTool } from "@/components/SchedulingTool";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Scheduling = () => {
   const [viewMode, setViewMode] = useState<"day" | "week" | "month">("week");
   const [activeTab, setActiveTab] = useState<"calendar" | "tool">("calendar");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTeacher, setSelectedTeacher] = useState("all");
+  const [selectedSchool, setSelectedSchool] = useState("all-schools");
+  const { toast } = useToast();
   
+  // Function to handle going to today's date
+  const handleTodayClick = () => {
+    // For now, just show a toast since we'll implement the calendar navigation later
+    toast({
+      title: "Today's Schedule",
+      description: "Navigated to today's date",
+    });
+  };
+
+  // Function to handle adding a new class
+  const handleAddClass = () => {
+    toast({
+      title: "Add New Class",
+      description: "Opening class creation form...",
+    });
+    // We'll implement the actual class creation modal in a future update
+  };
+
+  // Function to handle search
+  const handleSearch = (value: string) => {
+    setSearchQuery(value);
+    // Implementation for search functionality
+    console.log("Searching for:", value);
+  };
+
+  // Function to handle filter click
+  const handleFilterClick = () => {
+    toast({
+      title: "Filters",
+      description: "Opening advanced filters...",
+    });
+  };
+
+  // Function to handle teacher selection
+  const handleTeacherChange = (value: string) => {
+    setSelectedTeacher(value);
+    toast({
+      title: "Teacher Filter",
+      description: `Filtered by ${value === 'all' ? 'all teachers' : value}`,
+    });
+  };
+
+  // Function to handle school selection
+  const handleSchoolChange = (value: string) => {
+    setSelectedSchool(value);
+    toast({
+      title: "School Filter",
+      description: `Filtered by ${value === 'all-schools' ? 'all schools' : value}`,
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <h1 className="text-3xl font-bold tracking-tight text-schedule-header">Class Scheduling</h1>
         <div className="flex flex-wrap items-center gap-2">
-          <Button variant="outline" className="border-primary text-primary">
+          <Button 
+            variant="outline" 
+            className="border-primary text-primary"
+            onClick={handleTodayClick}
+          >
             <Calendar className="mr-2 h-4 w-4" /> Today
           </Button>
           <div className="flex items-center border border-primary rounded-md">
@@ -58,7 +118,10 @@ const Scheduling = () => {
 
         <TabsContent value="calendar" className="space-y-6">
           <div className="flex flex-col md:flex-row md:items-center gap-4">
-            <Button className="bg-schedule-green hover:bg-schedule-green/90 text-white">
+            <Button 
+              className="bg-schedule-green hover:bg-schedule-green/90 text-white"
+              onClick={handleAddClass}
+            >
               <Users className="mr-2 h-4 w-4" /> Add Class
             </Button>
             <div className="flex-1"></div>
@@ -68,9 +131,11 @@ const Scheduling = () => {
                 <Input 
                   placeholder="Search classes..." 
                   className="pl-8 border-primary/50 focus:border-primary w-full"
+                  value={searchQuery}
+                  onChange={(e) => handleSearch(e.target.value)}
                 />
               </div>
-              <Select defaultValue="all">
+              <Select value={selectedTeacher} onValueChange={handleTeacherChange}>
                 <SelectTrigger className="w-[180px] border-primary/50">
                   <SelectValue placeholder="All Teachers" />
                 </SelectTrigger>
@@ -80,7 +145,7 @@ const Scheduling = () => {
                   <SelectItem value="scheduled">Scheduled Teachers</SelectItem>
                 </SelectContent>
               </Select>
-              <Select defaultValue="all-schools">
+              <Select value={selectedSchool} onValueChange={handleSchoolChange}>
                 <SelectTrigger className="w-[180px] border-primary/50">
                   <SelectValue placeholder="All Schools" />
                 </SelectTrigger>
@@ -90,7 +155,12 @@ const Scheduling = () => {
                   <SelectItem value="school-2">HCMC Language Center</SelectItem>
                 </SelectContent>
               </Select>
-              <Button variant="outline" size="icon" className="border-primary text-primary">
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="border-primary text-primary"
+                onClick={handleFilterClick}
+              >
                 <Filter className="h-4 w-4" />
               </Button>
             </div>
@@ -231,7 +301,7 @@ const Scheduling = () => {
             </Card>
           </div>
         </TabsContent>
-
+        
         <TabsContent value="tool">
           <SchedulingTool />
         </TabsContent>
