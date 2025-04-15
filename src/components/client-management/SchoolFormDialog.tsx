@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -10,7 +11,6 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Tables, TablesInsert } from "@/integrations/supabase/types"; // Import the types
 
 // Define the form schema to match our database schema
 const formSchema = z.object({
@@ -64,7 +64,7 @@ export function SchoolFormDialog({ open, onOpenChange, onSchoolCreated }: School
     try {
       const { data, error } = await supabase
         .from('schools')
-        .insert([values])
+        .insert(values) // Fix: Pass a single object, not an array
         .select();
       
       if (error) {
