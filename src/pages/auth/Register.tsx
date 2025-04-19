@@ -6,11 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [passportNumber, setPassportNumber] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { signUp } = useAuth();
   const { toast } = useToast();
@@ -21,7 +23,7 @@ export default function Register() {
     setIsLoading(true);
     
     try {
-      await signUp(email, password, fullName);
+      await signUp(email, password, fullName, passportNumber);
       toast({
         title: "Account created",
         description: "Please check your email to confirm your account",
@@ -72,6 +74,18 @@ export default function Register() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="passportNumber">Passport Number</label>
+              <Input
+                id="passportNumber"
+                type="text"
+                placeholder="Enter your passport number"
+                value={passportNumber}
+                onChange={(e) => setPassportNumber(e.target.value)}
+                required
+              />
+              <p className="text-xs text-muted-foreground">Required for teacher registration</p>
             </div>
             <div className="space-y-2">
               <label htmlFor="password">Password</label>
