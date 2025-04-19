@@ -7,11 +7,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 
-export default function Login() {
+export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn } = useAuth();
+  const { signUp } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -20,12 +21,20 @@ export default function Login() {
     setIsLoading(true);
     
     try {
-      await signIn(email, password);
-      navigate("/dashboard");
-    } catch (error) {
+      await signUp(email, password, fullName);
       toast({
-        title: "Error",
-        description: "Invalid email or password",
+        title: "Account created",
+        description: "Please check your email to confirm your account",
+      });
+      navigate("/login");
+    } catch (error: any) {
+      let errorMessage = "An error occurred during registration";
+      if (error.message === "User already registered") {
+        errorMessage = "This email is already registered";
+      }
+      toast({
+        title: "Registration failed",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -37,11 +46,22 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-background">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Welcome back</CardTitle>
-          <CardDescription>Sign in to your account</CardDescription>
+          <CardTitle>Create an account</CardTitle>
+          <CardDescription>Sign up to get started</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <label htmlFor="fullName">Full Name</label>
+              <Input
+                id="fullName"
+                type="text"
+                placeholder="Enter your full name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                required
+              />
+            </div>
             <div className="space-y-2">
               <label htmlFor="email">Email</label>
               <Input
@@ -58,19 +78,20 @@ export default function Login() {
               <Input
                 id="password"
                 type="password"
-                placeholder="Enter your password"
+                placeholder="Create a password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                minLength={6}
               />
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Signing in..." : "Sign in"}
+              {isLoading ? "Creating account..." : "Sign up"}
             </Button>
             <div className="text-center text-sm mt-4">
-              Don't have an account?{" "}
-              <Link to="/register" className="text-primary hover:underline">
-                Sign up
+              Already have an account?{" "}
+              <Link to="/login" className="text-primary hover:underline">
+                Sign in
               </Link>
             </div>
           </form>
