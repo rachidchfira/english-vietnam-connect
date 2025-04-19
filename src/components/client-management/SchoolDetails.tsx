@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   Card, 
   CardContent, 
@@ -17,6 +17,8 @@ import {
   TabsTrigger 
 } from "@/components/ui/tabs";
 import { SupportChatbot } from "./SupportChatbot";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Building,
   Phone,
@@ -26,7 +28,8 @@ import {
   Users,
   FileText,
   Download as DownloadIcon,
-  Plus as PlusIcon
+  Plus as PlusIcon,
+  Loader2
 } from "lucide-react";
 
 interface SchoolDetailsProps {
@@ -36,78 +39,103 @@ interface SchoolDetailsProps {
 export function SchoolDetails({ schoolId }: SchoolDetailsProps) {
   const [activeTab, setActiveTab] = useState("overview");
   const [isChatbotMinimized, setIsChatbotMinimized] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [schoolData, setSchoolData] = useState<any>(null);
+  const { toast } = useToast();
   
-  // Mock data - in a real app, this would come from Supabase
-  const schoolData = {
-    id: schoolId,
-    name: "International English Academy",
-    address: "123 Nguyen Hue Street, District 1, HCMC",
-    phone: "+84 28 1234 5678",
-    email: "contact@iea.edu.vn",
-    website: "www.iea.edu.vn",
-    contactPerson: "Nguyen Van A",
-    contactRole: "HR Director",
-    contractStart: "2024-01-15",
-    contractEnd: "2025-01-14",
-    status: "active",
-    studentCount: 450,
-    teacherCount: 8,
-    requiredTeachers: 3,
-    classesTaught: 32,
-    notes: "Premium client, interested in expanding to northern provinces.",
-    bilingual: true,
-    documents: [
-      {
-        name: "Contract 2024",
-        date: "2024-01-15",
-        type: "contract"
-      },
-      {
-        name: "Teacher Requirements",
-        date: "2024-02-05",
-        type: "requirements"
-      },
-      {
-        name: "Payment Schedule",
-        date: "2024-01-20",
-        type: "financial"
+  useEffect(() => {
+    async function fetchSchoolData() {
+      setIsLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('schools')
+          .select('*')
+          .eq('id', schoolId)
+          .single();
+          
+        if (error) {
+          console.error("Error fetching school details:", error);
+          toast({
+            title: "Error loading school details",
+            description: error.message,
+            variant: "destructive"
+          });
+        } else if (data) {
+          console.log("Fetched school data:", data);
+          setSchoolData({
+            ...data,
+            studentCount: 450, // Mock data for now
+            teacherCount: 8,
+            requiredTeachers: 3,
+            classesTaught: 32,
+            bilingual: true,
+            documents: [
+              {
+                name: "Contract 2024",
+                date: data.contract_start,
+                type: "contract"
+              },
+              {
+                name: "Teacher Requirements",
+                date: new Date().toISOString().split('T')[0],
+                type: "requirements"
+              }
+            ],
+            recentActivity: [
+              {
+                type: "Teacher Request",
+                description: "Requested 2 new teachers",
+                date: new Date().toISOString().split('T')[0]
+              }
+            ]
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching school:", error);
+      } finally {
+        setIsLoading(false);
       }
-    ],
-    recentActivity: [
-      {
-        type: "Teacher Request",
-        description: "Requested 2 new teachers",
-        date: "2024-04-05"
-      },
-      {
-        type: "Message",
-        description: "Inquired about summer program",
-        date: "2024-04-02"
-      },
-      {
-        type: "Contract",
-        description: "Added addendum for additional classes",
-        date: "2024-03-25"
-      }
-    ]
-  };
+    }
+    
+    if (schoolId) {
+      fetchSchoolData();
+    }
+  }, [schoolId, toast]);
   
   const getBadgeVariant = (status: string) => {
     switch (status) {
       case "active": return "secondary";
-      case "pending": return "outline";
-      case "expired": return "destructive";
+      case "inactive": return "outline";
+      case "lead": return "default";
       default: return "default";
     }
   };
   
   const formatDate = (dateString: string) => {
+    if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
     });
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 text-primary animate-spin" />
+        <span className="ml-2">Loading school details...</span>
+      </div>
+    );
+  }
+
+  if (!schoolData) {
+    return (
+      <div className="text-center p-8 text-muted-foreground">
+        School not found or unable to load details
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -133,8 +161,8 @@ export function SchoolDetails({ schoolId }: SchoolDetailsProps) {
             <div className="flex items-center gap-3">
               <Building className="h-4 w-4 text-muted-foreground" />
               <div>
-                <div className="font-medium">{schoolData.contactPerson}</div>
-                <div className="text-sm text-muted-foreground">{schoolData.contactRole}</div>
+                <div className="font-medium">{schoolData.contact_person}</div>
+                <div className="text-sm text-muted-foreground">{schoolData.position}</div>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -155,11 +183,11 @@ export function SchoolDetails({ schoolId }: SchoolDetailsProps) {
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="text-sm text-muted-foreground">Start Date</div>
-              <div className="font-medium">{formatDate(schoolData.contractStart)}</div>
+              <div className="font-medium">{formatDate(schoolData.contract_start)}</div>
             </div>
             <div className="flex items-center justify-between">
               <div className="text-sm text-muted-foreground">End Date</div>
-              <div className="font-medium">{formatDate(schoolData.contractEnd)}</div>
+              <div className="font-medium">{formatDate(schoolData.contract_end)}</div>
             </div>
             <div className="flex items-center justify-between">
               <div className="text-sm text-muted-foreground">Bilingual Support</div>
@@ -213,7 +241,7 @@ export function SchoolDetails({ schoolId }: SchoolDetailsProps) {
               <div className="space-y-4">
                 <div>
                   <h3 className="font-medium mb-2">Notes</h3>
-                  <p className="text-muted-foreground">{schoolData.notes}</p>
+                  <p className="text-muted-foreground">{schoolData.notes || "No notes available."}</p>
                 </div>
                 <Separator />
                 <div>
@@ -287,7 +315,7 @@ export function SchoolDetails({ schoolId }: SchoolDetailsProps) {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {schoolData.documents.map((doc, index) => (
+                {schoolData.documents.map((doc: any, index: number) => (
                   <div key={index} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <FileText className="h-4 w-4 text-muted-foreground" />
@@ -315,7 +343,7 @@ export function SchoolDetails({ schoolId }: SchoolDetailsProps) {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {schoolData.recentActivity.map((activity, index) => (
+                {schoolData.recentActivity.map((activity: any, index: number) => (
                   <div key={index} className="flex items-start gap-4">
                     <div className="mt-0.5">
                       <Calendar className="h-4 w-4 text-muted-foreground" />

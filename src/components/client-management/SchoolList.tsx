@@ -1,9 +1,10 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Building, Search, MapPin, Phone, Calendar, Download } from "lucide-react";
+import { Building, Search, MapPin, Phone, Calendar, Download, Loader2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -20,9 +21,10 @@ interface School {
 
 interface SchoolListProps {
   onSchoolSelect: (id: string) => void;
+  refreshTrigger?: number;
 }
 
-export function SchoolList({ onSchoolSelect }: SchoolListProps) {
+export function SchoolList({ onSchoolSelect, refreshTrigger = 0 }: SchoolListProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [schools, setSchools] = useState<School[]>([]);
@@ -33,13 +35,15 @@ export function SchoolList({ onSchoolSelect }: SchoolListProps) {
     async function fetchSchools() {
       setIsLoading(true);
       try {
-        let { data, error } = await supabase
+        console.log("Fetching schools...");
+        const { data, error } = await supabase
           .from('schools')
           .select('id, name, location, contact_person, phone, contract_end, status');
           
         if (error) {
           console.error("Error fetching schools:", error);
         } else {
+          console.log("Schools fetched:", data);
           setSchools(data || []);
         }
       } catch (error) {
@@ -50,7 +54,7 @@ export function SchoolList({ onSchoolSelect }: SchoolListProps) {
     }
     
     fetchSchools();
-  }, []);
+  }, [refreshTrigger]); // Now it will refetch when refreshTrigger changes
   
   const filteredSchools = schools.filter(school => {
     const matchesSearch = school.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -69,6 +73,8 @@ export function SchoolList({ onSchoolSelect }: SchoolListProps) {
         return <Badge className="bg-amber-500">Renewal Needed</Badge>;
       case "inactive":
         return <Badge className="bg-gray-500">Inactive</Badge>;
+      case "lead":
+        return <Badge className="bg-blue-500">Lead</Badge>;
       default:
         return <Badge>{status}</Badge>;
     }
@@ -93,7 +99,7 @@ export function SchoolList({ onSchoolSelect }: SchoolListProps) {
           <SelectContent>
             <SelectItem value="all">All Statuses</SelectItem>
             <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="renewal">Renewal Needed</SelectItem>
+            <SelectItem value="lead">Lead</SelectItem>
             <SelectItem value="inactive">Inactive</SelectItem>
           </SelectContent>
         </Select>
@@ -111,7 +117,10 @@ export function SchoolList({ onSchoolSelect }: SchoolListProps) {
         </CardHeader>
         <CardContent className="p-0">
           {isLoading ? (
-            <div className="p-8 text-center">Loading schools...</div>
+            <div className="p-8 text-center flex items-center justify-center">
+              <Loader2 className="h-6 w-6 animate-spin mr-2" />
+              <span>Loading schools...</span>
+            </div>
           ) : (
             <>
               <div className="border-b px-6 py-3 grid grid-cols-1 md:grid-cols-5 font-medium text-sm">
@@ -145,7 +154,7 @@ export function SchoolList({ onSchoolSelect }: SchoolListProps) {
                     </div>
                     <div className="flex items-center">
                       <Calendar className="mr-2 h-4 w-4 text-muted-foreground md:hidden" />
-                      {new Date(school.contract_end).toLocaleDateString()}
+                      {school.contract_end ? new Date(school.contract_end).toLocaleDateString() : 'N/A'}
                     </div>
                     <div>
                       {getStatusBadge(school.status)}

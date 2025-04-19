@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -14,6 +14,7 @@ const ClientManagement = () => {
   const [activeTab, setActiveTab] = useState("schools");
   const [selectedSchoolId, setSelectedSchoolId] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const { toast } = useToast();
 
   const handleSchoolSelect = (id: string) => {
@@ -27,6 +28,8 @@ const ClientManagement = () => {
 
   const handleSchoolCreated = () => {
     setIsDialogOpen(false);
+    // Increment refresh trigger to cause SchoolList to reload
+    setRefreshTrigger(prev => prev + 1);
     toast({
       title: "School added",
       description: "The school has been successfully added to the system."
@@ -51,7 +54,10 @@ const ClientManagement = () => {
         </TabsList>
         
         <TabsContent value="schools" className="space-y-4">
-          <SchoolList onSchoolSelect={handleSchoolSelect} />
+          <SchoolList 
+            onSchoolSelect={handleSchoolSelect} 
+            refreshTrigger={refreshTrigger}
+          />
         </TabsContent>
         
         <TabsContent value="details">

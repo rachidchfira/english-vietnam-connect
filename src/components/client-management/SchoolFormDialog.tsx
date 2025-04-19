@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -62,9 +61,26 @@ export function SchoolFormDialog({ open, onOpenChange, onSchoolCreated }: School
     setIsSubmitting(true);
     
     try {
+      // Ensure all required fields are present
+      const schoolData = {
+        name: values.name,
+        location: values.location,
+        address: values.address,
+        contact_person: values.contact_person,
+        position: values.position,
+        email: values.email,
+        phone: values.phone,
+        website: values.website || null,
+        contract_start: values.contract_start,
+        contract_end: values.contract_end,
+        status: values.status,
+        notes: values.notes || null,
+      };
+      
+      // Send complete data object to Supabase
       const { data, error } = await supabase
         .from('schools')
-        .insert(values) // Fix: Pass a single object, not an array
+        .insert(schoolData)
         .select();
       
       if (error) {
@@ -81,7 +97,6 @@ export function SchoolFormDialog({ open, onOpenChange, onSchoolCreated }: School
         });
         form.reset();
         onSchoolCreated();
-        onOpenChange(false);
       }
     } catch (error) {
       console.error("Error creating school:", error);
