@@ -2,6 +2,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { useSession } from '@/hooks/useSession';
 
 type AuthContextType = {
   session: Session | null;
@@ -16,46 +17,34 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
+  const session = useSession();
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isTeacher, setIsTeacher] = useState(false);
 
   useEffect(() => {
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, currentSession) => {
-        setSession(currentSession);
-        setUser(currentSession?.user ?? null);
-        
-        if (currentSession?.user) {
-          // Check user role
-          const { data: isAdminResult } = await supabase.rpc('is_admin', {
-            user_id: currentSession.user.id
-          });
-          const { data: isTeacherResult } = await supabase.rpc('is_teacher', {
-            user_id: currentSession.user.id
-          });
-          
-          setIsAdmin(isAdminResult || false);
-          setIsTeacher(isTeacherResult || false);
-        } else {
-          setIsAdmin(false);
-          setIsTeacher(false);
+    setUser(session?.user ?? null);
+    
+    if (session?.user) {
+      // Check user roles
+      const checkRoles = async () => {
+        const { data: userRoles } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', session.user.id);
+
+        if (userRoles) {
+          setIsAdmin(userRoles.some(role => role.role === 'admin'));
+          setIsTeacher(userRoles.some(role => role.role === 'teacher'));
         }
-      }
-    );
+      };
 
-    // Check current session
-    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
-      setSession(currentSession);
-      setUser(currentSession?.user ?? null);
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
+      checkRoles();
+    } else {
+      setIsAdmin(false);
+      setIsTeacher(false);
+    }
+  }, [session]);
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
