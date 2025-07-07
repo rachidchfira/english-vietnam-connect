@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
@@ -15,12 +16,10 @@ import {
   BarChart, 
   Calendar,
   Menu,
-  Globe,
-  LogOut
+  Globe
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/contexts/AuthContext";
 
 type NavItem = {
   title: string;
@@ -77,18 +76,10 @@ const navItems: NavItem[] = [
 export function AppSidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [language, setLanguage] = useState<'en' | 'vi'>('en');
-  const { isAdmin, signOut } = useAuth();
 
   const toggleLanguage = () => {
     setLanguage(prev => prev === 'en' ? 'vi' : 'en');
   };
-
-  // Filter navigation items based on user role
-  const filteredNavItems = navItems.filter(item => {
-    if (isAdmin) return true; // Admins can see all items
-    // Teachers can only see specific items
-    return ['Workforce', 'Resources', 'Scheduling'].includes(item.title);
-  });
 
   return (
     <Sidebar
@@ -114,7 +105,7 @@ export function AppSidebar() {
 
       <SidebarContent className="p-2">
         <nav className="grid gap-1">
-          {filteredNavItems.map((item) => (
+          {navItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
@@ -140,15 +131,6 @@ export function AppSidebar() {
         >
           <Globe className="h-5 w-5 mr-2" />
           {!isCollapsed && <span>{language === 'en' ? 'Vietnamese' : 'English'}</span>}
-        </Button>
-        <Button
-          variant="ghost"
-          size={isCollapsed ? "icon" : "sm"}
-          onClick={signOut}
-          className="w-full"
-        >
-          <LogOut className="h-5 w-5 mr-2" />
-          {!isCollapsed && <span>Sign out</span>}
         </Button>
       </SidebarFooter>
     </Sidebar>
